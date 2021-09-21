@@ -8,6 +8,7 @@ import (
    "github.com/justinas/alice"
    "github.com/ayush/secure-api/server/middleware/myJWT"
    "github.com/ayush/secure-api/db"
+   "github.com/ayush/secure-api/server/templates"
 )
 
 func recoverHandler(next http.Handler) http.Handler {
@@ -34,7 +35,9 @@ func authHandler(next http.Handler) http.Handler {
 
 func logicHandler(res http.ResponseWriter, req *http.Request) {
    switch req.URL.Path {
-      case "/restricted"
+      case "/restricted":
+         csrfSecret := grabCsrfFromRequest(req)
+         templates.RenderTemplate(res, "restricted", &templates.Dashboard{csrfSecret, "Hello, Ayush!"})
       case "/login":
          switch req.Method {
             case "GET":
