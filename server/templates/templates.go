@@ -6,17 +6,17 @@ import (
    "html/template"
 )
 
-type Login struct {
+type LoginPage struct {
    BAlertUser bool
    AlertMsg   string
 }
 
-type Register struct {
+type RegisterPage struct {
    BAlertUser bool
    AlertMsg   string
 }
 
-type Dashboard struct {
+type DashboardPage struct {
    BAlertUser bool
    AlertMsg   string
 }
@@ -28,7 +28,7 @@ var template = template.Must(template.ParseFiles(
 ))
 
 func RenderTemplate(res http.ResponseWriter, tmpl string, p interface{}) {
-   err := templates.ExecuteTemplate(res, tmpl + ".tmpl", p)
+   err := template.ExecuteTemplate(res, tmpl + ".tmpl", p)
    if err != nil {
       log.Printf("You've got template err %v", err)
       http.Error(res, err.Error(), http.StatusInternalServerError)

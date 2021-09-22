@@ -37,7 +37,7 @@ func logicHandler(res http.ResponseWriter, req *http.Request) {
    switch req.URL.Path {
       case "/restricted":
          csrfSecret := grabCsrfFromRequest(req)
-         templates.RenderTemplate(res, "restricted", &templates.Dashboard{csrfSecret, "Hello, Ayush!"})
+         templates.RenderTemplate(res, "restricted", &templates.DashboardPage{csrfSecret, "Hello, Ayush!"})
       case "/login":
          switch req.Method {
             case "GET":
@@ -47,10 +47,35 @@ func logicHandler(res http.ResponseWriter, req *http.Request) {
       case "/register":
          switch req.Method {
             case "GET":
+               templates.RenderTemplate(res, "register", &templates.RegisterPage{false, ""})
             case "POST":
+               req.ParseForm()
+               log.Println(req.Form)
+               _, uuid, err := db.FetchUserByUsername(strings.Join(req.Form["username"], ""))
+               if err == nil {
+                  res.WriteHeader(http.StatusUnauthorized)
+               } else {
+                  role := 
+                  uuid, err := db.StoreUser(strings.Join(req.Form["username"], ""), strings.Join(req.Form["password"], ""), role)
+                  if err != nil {
+                     http.Error(res, http.StatusText(500), 500)
+                  }
+                  log.Println("uuid: " + uuid)
+                  
+                  authToken, refreshToken, csrfSecret, err := myJWT.CreateNewTokens(uuid, role)
+                  if err != nil {
+                     http.Error(res, http.StatusText(500), 500)
+                  }
+                  setAuthAndRefreshCookies(&res, authToken, refreshToken)
+                  res.Header().Set("X-CSRF-Token", csrfSecret)
+                  res.WriteHeader(http.StatusOK)
+               }
             default:
+               res.WriteHeader(http.StatusMethodNotAllowed)
          }
       case "/logout":
+         nullifyTokenCookies(&res, req)
+         http.Redirect(res, req, "/login", 302)
       case "/deleteUser":
       default: 
    }
