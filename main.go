@@ -7,8 +7,10 @@ import (
    "github.com/ayush/secure-api/server/middleware/myJWT"
 )
 
-var host = "localhost"
-var port = "8000"
+const (
+   HOST = "localhost"
+   PORT = "8000"
+)
 
 func main() {
    db.InitDB()
@@ -19,7 +21,7 @@ func main() {
       log.Fatal(jwtError)
    }
    
-   serverError := server.StartServer(host, port)
+   serverError := server.StartServer(HOST, PORT)
    if serverError != nil {
       log.Println("Error starting server!")
       log.Fatal(serverError)
