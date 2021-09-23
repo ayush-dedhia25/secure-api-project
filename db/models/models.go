@@ -2,7 +2,7 @@ package models
 
 import (
    "time"
-   jwt "github.com/djrijalva/jwt-go"
+   jwt "github.com/dgrijalva/jwt-go"
    "github.com/ayush/secure-api/randomstrings"
 )
 
